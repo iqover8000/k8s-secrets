@@ -27,3 +27,6 @@ build_k8s_secrets::
 
 push_k8s_secrets::
 	$(call push-cmd)
+
+test_k8s_secrets::
+	$(call test-cmd)

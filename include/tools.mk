@@ -11,6 +11,19 @@ define help-cmd
 
 endef
 
+define test-cmd
+@echo "==> Testing"
+@docker run --rm \
+            -it \
+            -v $(shell pwd)/k8s-secrets.py:/usr/local/bin/k8s-secrets.py \
+            -v $(HOME)/.aws:/root/.aws \
+            -v $(KUBECONFIG):/workdir/config:ro \
+            -e KUBECONFIG=/workdir/config \
+            quay.io/iqover8000/k8s-secrets:$(SERVICE_VERSION)
+@echo ""
+
+endef
+
 define build-cmd
 @echo "==> Building k8s-secrets image"
 @docker build . -t quay.io/iqover8000/k8s-secrets:$(SERVICE_VERSION)
