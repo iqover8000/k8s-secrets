@@ -19,8 +19,8 @@ define test-cmd
             -v $(HOME)/.aws:/root/.aws \
             -v $(KUBECONFIG):/workdir/config:ro \
             -e KUBECONFIG=/workdir/config \
-            quay.io/iqover8000/k8s-secrets:$(SERVICE_VERSION) \
-            --action list
+            --env-file test.env \
+            quay.io/iqover8000/k8s-secrets:$(SERVICE_VERSION)
 @echo ""
 
 endef
