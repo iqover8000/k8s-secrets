@@ -12,7 +12,6 @@ define help-cmd
 endef
 
 define test-cmd
-@echo "==> Testing"
 @docker run --rm \
             -it \
             -v $(shell pwd)/k8s-secrets.py:/usr/local/bin/k8s-secrets.py \

@@ -4,6 +4,25 @@ from kubernetes import client, config
 from termcolor import colored
 from os import getenv
 from sys import exit
+from requests import post
+from base64 import b64decode
+
+
+def upload_to_pastebin(paste):
+    headers = {
+        'Content-Type': 'application/x-www-form',
+    }
+    params = {
+        "burn": "true",
+        "ttl": 300
+    }
+    response = post(
+        url=PASTE_URL,
+        data=paste,
+        params=params,
+        headers=headers
+    )
+    return response.text
 
 
 def get_secrets():
@@ -15,14 +34,12 @@ def get_secrets():
         print()
 
 
-def get_secret(name, namespace, key):
+def get_named_secret(name, namespace):
     secret = v1.read_namespaced_secret(name, namespace)
-    print(secret)
-    # for i in secrets.items:
-    #     print(f"==> {colored(i.metadata.name, 'yellow')} (namespace: {i.metadata.namespace}):")
-    #     for k, v in i.data.items():
-    #         print(f"      {colored(k, 'green')}: ***hidden*secret***")
-    #     print()
+    print(f"==> {colored(secret.metadata.name, 'yellow')} (namespace: {secret.metadata.namespace}):")
+    for k, v in secret.data.items():
+        paste_link = upload_to_pastebin(b64decode(v))
+        print(f"      {colored(k, 'green')}: {paste_link}")
 
 
 if __name__ == "__main__":
@@ -30,9 +47,6 @@ if __name__ == "__main__":
     v1 = client.CoreV1Api()
 
     ACTION = getenv("ACTION")
-    OTS_URL = 'https://onetimesecret.com'
-    OTS_USER = getenv("OTS_USER")
-    OTS_USER = getenv("OTS_TOKEN")
 
     match ACTION:
         case "list":
@@ -40,8 +54,8 @@ if __name__ == "__main__":
         case "show":
             SECRET = getenv("SECRET")
             NAMESPACE = getenv("NAMESPACE")
-            KEY = getenv("KEY")
-            get_secret(SECRET, NAMESPACE, KEY)
+            PASTE_URL = getenv("PASTE_URL")
+            get_named_secret(SECRET, NAMESPACE)
         case "add":
             print("Will be implemented soon")
         case "delete":
